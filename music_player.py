@@ -1,5 +1,5 @@
 import tkinter as tk
-from tkinter import messagebox
+from tkinter import messagebox, filedialog
 import pygame
 from pathlib import Path
 from typing import Dict
@@ -19,43 +19,39 @@ class MainApp:
 
     def _init_ui(self):
         self._song_list = tk.Listbox(self._parent,
-            bg='black', fg='white', height=25, width=55)
+                                     bg='black', fg='white', height=25,
+                                     width=55)
         self._song_list.grid(row=0, column=0)
 
         self._buttons_frame = tk.Frame(self._parent)
         self._buttons_frame.grid(row=1, column=0)
 
         button_dict = {
-            'prev': [1, self._click_prev],
-            'play': [2, self._click_play],
-            'pause': [3, self._click_pause],
-            'next': [4, self._click_next],
-            'trash': [5, self._click_delete]
+            'add': [1, self._click_add],
+            'prev': [2, self._click_prev],
+            'play': [3, self._click_play],
+            'pause': [4, self._click_pause],
+            'next': [5, self._click_next],
+            'trash': [6, self._click_delete]
         }
 
         for name, (row, callback) in button_dict.items():
-            tk.Button(self._buttons_frame, image=self._images[name], command=callback) \
+            tk.Button(self._buttons_frame, image=self._images[name],
+                      command=callback) \
                 .grid(row=0, column=row, padx=10, pady=10)
 
-        self._display_music()
-
     def _load_images(self) -> Dict[str, tk.PhotoImage]:
-        img_names = ['play', 'pause', 'next', 'prev', 'trash']
+        img_names = ['add', 'play', 'pause', 'next', 'prev', 'trash']
         img_dict = {}
         for name in img_names:
-            img_dict[name] = tk.PhotoImage(file= IMAGE_DIR / f'{name}.png')
+            img_dict[name] = tk.PhotoImage(file=IMAGE_DIR / f'{name}.png')
         return img_dict
 
-    def _display_music(self):
-        # display songs to the song_list
-        for song in SONGS_DIR.glob('*.mp3'):
-            self._song_list.insert(tk.END, song.name)
-        # clear song box
-        self._song_list.selection_clear(0, tk.END)
-        # activate first song
-        self._song_list.activate(0)
-        # select first song
-        self._song_list.selection_set(0)
+    def _click_add(self):
+        # add songs to the song_list
+        song = filedialog.askopenfilename(initialdir=SONGS_DIR,
+                                          title='Choose a song')
+        self._song_list.insert(tk.END, song[song.rfind('/') + 1:])
 
     def _click_play(self):
         # check if a song is selected
@@ -63,7 +59,8 @@ class MainApp:
             messagebox.showerror('show error', 'no song selected!')
         # if the song paused is same as the song selected
         # then unpause the song and update paused to False
-        elif self._current_song == self._song_list.get(tk.ACTIVE) and self._paused:
+        elif self._current_song == self._song_list.get(
+                tk.ACTIVE) and self._paused:
             self._unpause_music()
         # otherwise, just play the song selected
         # and update the current song to the song selected
@@ -76,7 +73,7 @@ class MainApp:
             messagebox.showerror('show error', 'no song selected!')
         # if no song is playing
         elif self._paused is True:
-            messagebox.showerror('show error', 'no song is playing')
+            messagebox.showerror('show error', 'no song is playing!')
         # if a song is selected but the selected song is different from the
         # song playing
         elif self._current_song != self._song_list.get(tk.ACTIVE):
@@ -102,7 +99,7 @@ class MainApp:
             # play next song
             self._play_music_by_index(next_song_index)
         except IndexError:
-            messagebox.showerror('show error', 'No song selected!')
+            messagebox.showerror('show error', 'no song selected!')
 
     def _click_prev(self):
         """
@@ -119,7 +116,7 @@ class MainApp:
             # play previous song
             self._play_music_by_index(prev_song_index)
         except IndexError:
-            messagebox.showerror('show error', 'No song selected!')
+            messagebox.showerror('show error', 'no song selected!')
 
     def _click_delete(self):
         """
@@ -134,7 +131,7 @@ class MainApp:
                 self._pause_music()
             self._song_list.delete(self._song_list.curselection()[0])
         except IndexError:
-            messagebox.showerror('show error', 'No song selected!')
+            messagebox.showerror('show error', 'no song selected!')
 
     def _play_music(self):
         """

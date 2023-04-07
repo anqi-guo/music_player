@@ -3,6 +3,8 @@ from tkinter import messagebox, filedialog
 import pygame
 from pathlib import Path
 from typing import Dict
+import warnings
+warnings.filterwarnings('ignore')
 
 SONGS_DIR = Path('audio')
 IMAGE_DIR = Path('logo')
@@ -54,7 +56,15 @@ class MainApp:
         # add songs to the song_list
         song = filedialog.askopenfilename(initialdir=SONGS_DIR,
                                           title='Choose a song')
-        self.song_list.insert(tk.END, song[song.rfind('/') + 1:])
+        # only keep the song name
+        song_short = song[song.rfind('/') + 1:]
+        # get all songs in song_list
+        all_songs = self.song_list.get(0, tk.END)
+        if song_short in all_songs:
+            messagebox.showerror('show error', 'the song is already added!')
+            self.click_add()
+        else:
+            self.song_list.insert(tk.END, song_short)
 
     def click_play(self):
         # check if a song is selected

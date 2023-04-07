@@ -31,6 +31,16 @@ class TestApp(unittest.TestCase):
         assert self.app.song_list.size() == 1
 
     @patch('tkinter.messagebox.showerror')
+    def test_add_duplicated_music(self, mock_messagebox):
+        # test adding music that is already in the song list
+        # add a random song
+        self.app.click_add()
+        # add that song one more time
+        self.app.click_add()
+        mock_messagebox.assert_called_once_with('show error',
+                                                'the song is already added!')
+
+    @patch('tkinter.messagebox.showerror')
     def test_play_music_with_no_song_selected(self, mock_messagebox):
         # test if an error message is displayed when no song is selected to
         # play

@@ -1,13 +1,18 @@
+"""
+Music Player
+
+An app that supports adding, deleting, playing, and pausing musics in audio
+folder.
+"""
+
 import tkinter as tk
 from tkinter import messagebox, filedialog
 import pygame
 from pathlib import Path
 from typing import Dict
-import warnings
-warnings.filterwarnings('ignore')
 
 SONGS_DIR = Path('audio')
-IMAGE_DIR = Path('logo')
+IMAGE_DIR = Path('pic')
 
 BUTTONS = {
     'add': [1, 'click_add'],
@@ -29,17 +34,20 @@ class MainApp:
         self._init_sound()
 
     def _init_ui(self):
-        self.song_list = tk.Listbox(self.root,
-                                    bg='black', fg='white', height=25,
-                                    width=55)
+        self.song_list = tk.Listbox(
+            self.root, bg='black', fg='white', height=25, width=55
+        )
         self.song_list.grid(row=0, column=0)
 
         self.buttons_frame = tk.Frame(self.root)
         self.buttons_frame.grid(row=1, column=0)
 
         for name, (row, callback) in BUTTONS.items():
-            button = tk.Button(self.buttons_frame, image=self.image_dict[name],
-                               command=getattr(self, callback))
+            button = tk.Button(
+                self.buttons_frame,
+                image=self.image_dict[name],
+                command=getattr(self, callback)
+            )
             button.grid(row=0, column=row, padx=10, pady=10)
 
     def _init_sound(self):
@@ -52,17 +60,23 @@ class MainApp:
             for name in img_names
         }
 
-    def click_add(self):
+    def click_add(self, attempts=0):
         # add songs to the song_list
-        song = filedialog.askopenfilename(initialdir=SONGS_DIR,
-                                          title='Choose a song')
+        song = filedialog.askopenfilename(
+            initialdir=SONGS_DIR,
+            title='Choose a song'
+        )
         # only keep the song name
         song_short = song[song.rfind('/') + 1:]
         # get all songs in song_list
         all_songs = self.song_list.get(0, tk.END)
         if song_short in all_songs:
-            messagebox.showerror('show error', 'the song is already added!')
-            self.click_add()
+            if attempts <= 3:
+                messagebox.showerror('show error', 'the song is already added!')
+                self.click_add(attempts+1)
+            else:
+                messagebox.showerror('show error', 'too many attempts to add '
+                                                   'a duplicated song!')
         else:
             self.song_list.insert(tk.END, song_short)
 

@@ -9,7 +9,6 @@ import tkinter as tk
 from tkinter import messagebox, filedialog
 import pygame
 from pathlib import Path
-from typing import Dict
 
 SONGS_DIR = Path('audio')
 IMAGE_DIR = Path('pic')
@@ -34,6 +33,11 @@ class MainApp:
         self._init_sound()
 
     def _init_ui(self):
+        """
+        initiate the ui, including a listbox that contains all the added
+        songs, and buttons in the bottom area
+        :return: None
+        """
         self.song_list = tk.Listbox(
             self.root, bg='black', fg='white', height=25, width=55
         )
@@ -51,9 +55,18 @@ class MainApp:
             button.grid(row=0, column=row, padx=10, pady=10)
 
     def _init_sound(self):
+        """
+        initiate the pygame module so that the songs will be played once the
+        pygame.mixer.music.play() is triggered
+        :return: None
+        """
         pygame.init()
 
-    def load_images(self) -> Dict[str, tk.PhotoImage]:
+    def load_images(self):
+        """
+        load the button images into tk.PhotoImage format
+        :return: None
+        """
         img_names = ['add', 'play', 'pause', 'next', 'prev', 'trash']
         return {
             name: tk.PhotoImage(file=IMAGE_DIR / f'{name}.png')
@@ -61,6 +74,11 @@ class MainApp:
         }
 
     def click_add(self, attempts=0):
+        """
+        click the "add" button
+        :param attempts: number of attempts on choosing duplicated songs
+        :return: None
+        """
         # add songs to the song_list
         song = filedialog.askopenfilename(
             initialdir=SONGS_DIR,
@@ -81,6 +99,10 @@ class MainApp:
             self.song_list.insert(tk.END, song_short)
 
     def click_play(self):
+        """
+        click the "play" button
+        :return: None
+        """
         # check if a song is selected
         if self.song_list.curselection() == ():
             messagebox.showerror('show error', 'no song selected!')
@@ -95,6 +117,10 @@ class MainApp:
             self.play_music()
 
     def click_pause(self):
+        """
+        click the "pause" button
+        :return: None
+        """
         # if no song is selected
         if self.song_list.curselection() == ():
             messagebox.showerror('show error', 'no song selected!')
@@ -113,7 +139,7 @@ class MainApp:
 
     def click_next(self):
         """
-        Play the song below the song selected
+        click the "next" button
         :return: None
         """
         try:
@@ -130,7 +156,7 @@ class MainApp:
 
     def click_prev(self):
         """
-        Play the song above the song selected
+        click the "prev" button
         :return: None
         """
         try:
@@ -147,7 +173,7 @@ class MainApp:
 
     def click_delete(self):
         """
-        Delete the selected music from the Listbox
+        click the "delete" button
         :return: None
         """
         try:
@@ -162,7 +188,7 @@ class MainApp:
 
     def play_music(self):
         """
-        Play the current music
+        play the current music
         :return: None
         """
         # get current song name

@@ -1,0 +1,1 @@
+![alt text](https://github.com/anqi-guo/music_player/blob/main/pic/music_player.png?raw=true)

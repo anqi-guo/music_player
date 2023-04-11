@@ -61,7 +61,7 @@ class TestApp(unittest.TestCase):
         self.app.song_list.selection_clear(0, 'end')
         self.app.click_play()
         mock_messagebox.assert_called_once_with('show error',
-                                                'the song is already added!')
+                                                'no song selected!')
 
     @patch('pygame.mixer.music.load')
     @patch('pygame.mixer.music.play')
@@ -162,3 +162,7 @@ class TestApp(unittest.TestCase):
         self.app.click_delete()
         mock_messagebox.assert_called_once_with('show error',
                                                 'no song selected!')
+
+
+if __name__ == '__main__':
+    unittest.main()

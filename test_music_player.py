@@ -1,7 +1,10 @@
-import unittest
-from unittest.mock import patch
-import tkinter as tk
+"""
+Tests methods in MainApp classes in music_player.py
+"""
 
+import unittest
+from unittest.mock import patch, Mock, call
+import tkinter as tk
 from music_player import MainApp, SONGS_DIR
 
 
@@ -22,23 +25,34 @@ class TestApp(unittest.TestCase):
             self.assertIsInstance(img, tk.PhotoImage)
 
     def test_add_music(self):
-        # test if music can be added to the listbox
-        # check if listbox is empty
-        assert self.app.song_list.size() == 0
-        # add a song to the listbox
-        self.app.click_add()
-        # check if song is added to the listbox
-        assert self.app.song_list.size() == 1
+        # create a mock file dialog
+        mock_file_dialog = Mock()
+        mock_file_dialog.return_value = 'lifelike.mp3'
+        # patch the filedialog.askopenfilename method to use the mock file
+        # dialog
+        with patch('tkinter.filedialog.askopenfilename', new=mock_file_dialog):
+            # simulate clicking on the "add" button
+            self.app.click_add()
+        # check that the song was added to the song list
+        song_list = self.app.song_list.get(0, tk.END)
+        self.assertIn('lifelike.mp3', song_list)
 
     @patch('tkinter.messagebox.showerror')
-    def test_add_duplicated_music(self, mock_messagebox):
-        # test adding music that is already in the song list
-        # add a random song
-        self.app.click_add()
-        # add that song one more time
-        self.app.click_add()
-        mock_messagebox.assert_called_once_with('show error',
-                                                'the song is already added!')
+    def test_click_add_duplicate_song(self, mock_messagebox):
+        # set up the test by adding a song to the song_list
+        self.app.song_list.insert(tk.END, 'drop-it.mp3')
+        # create a mock file dialog
+        mock_file_dialog = Mock()
+        mock_file_dialog.return_value = 'drop-it.mp3'
+        # patch the filedialog.askopenfilename method to use the mock file
+        # dialog
+        with patch('tkinter.filedialog.askopenfilename', new=mock_file_dialog):
+            self.app.click_add(attempts=3)
+
+        mock_messagebox.assert_has_calls([
+            call('show error', 'the song is already added!'),
+            call('show error', 'too many attempts to add a duplicated song!')
+        ])
 
     @patch('tkinter.messagebox.showerror')
     def test_play_music_with_no_song_selected(self, mock_messagebox):
@@ -47,7 +61,7 @@ class TestApp(unittest.TestCase):
         self.app.song_list.selection_clear(0, 'end')
         self.app.click_play()
         mock_messagebox.assert_called_once_with('show error',
-                                                'no song selected!')
+                                                'the song is already added!')
 
     @patch('pygame.mixer.music.load')
     @patch('pygame.mixer.music.play')
@@ -148,5 +162,3 @@ class TestApp(unittest.TestCase):
         self.app.click_delete()
         mock_messagebox.assert_called_once_with('show error',
                                                 'no song selected!')
-
-

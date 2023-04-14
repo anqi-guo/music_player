@@ -1,8 +1,7 @@
 """
 Music Player
 
-An app that supports adding, deleting, playing, and pausing musics in audio
-folder.
+An app that supports adding, deleting, playing, and pausing musics.
 """
 
 import tkinter as tk
@@ -38,10 +37,10 @@ class MainApp:
         songs, and buttons in the bottom area
         :return: None
         """
-        self.song_list = tk.Listbox(
+        self.playlist = tk.Listbox(
             self.root, bg='black', fg='white', height=25, width=55
         )
-        self.song_list.grid(row=0, column=0)
+        self.playlist.grid(row=0, column=0)
 
         self.buttons_frame = tk.Frame(self.root)
         self.buttons_frame.grid(row=1, column=0)
@@ -84,19 +83,23 @@ class MainApp:
             initialdir=SONGS_DIR,
             title='Choose a song'
         )
-        # only keep the song name
-        song_short = song[song.rfind('/') + 1:]
-        # get all songs in song_list
-        all_songs = self.song_list.get(0, tk.END)
-        if song_short in all_songs:
-            if attempts <= 3:
-                messagebox.showerror('show error', 'the song is already added!')
-                self.click_add(attempts+1)
+        # if no song is selected then pass
+        if song:
+            # only keep the song name
+            song_short = song[song.rfind('/') + 1:]
+            # get all songs in song_list
+            all_songs = self.playlist.get(0, tk.END)
+            if song_short in all_songs:
+                if attempts <= 3:
+                    messagebox.showerror(
+                        'show error', 'the song is already added!')
+                    self.click_add(attempts+1)
+                else:
+                    messagebox.showerror(
+                        'show error',
+                        'too many attempts to add a duplicated song!')
             else:
-                messagebox.showerror('show error', 'too many attempts to add '
-                                                   'a duplicated song!')
-        else:
-            self.song_list.insert(tk.END, song_short)
+                self.playlist.insert(tk.END, song_short)
 
     def click_play(self):
         """
@@ -104,11 +107,11 @@ class MainApp:
         :return: None
         """
         # check if a song is selected
-        if self.song_list.curselection() == ():
+        if self.playlist.curselection() == ():
             messagebox.showerror('show error', 'no song selected!')
         # if the song paused is same as the song selected
         # then unpause the song and update paused to False
-        elif self.current_song == self.song_list.get(
+        elif self.current_song == self.playlist.get(
                 tk.ACTIVE) and self.paused:
             self.unpause_music()
         # otherwise, just play the song selected
@@ -122,14 +125,14 @@ class MainApp:
         :return: None
         """
         # if no song is selected
-        if self.song_list.curselection() == ():
+        if self.playlist.curselection() == ():
             messagebox.showerror('show error', 'no song selected!')
         # if no song is playing
         elif self.paused is True:
             messagebox.showerror('show error', 'no song is playing!')
         # if a song is selected but the selected song is different from the
         # song playing
-        elif self.current_song != self.song_list.get(tk.ACTIVE):
+        elif self.current_song != self.playlist.get(tk.ACTIVE):
             messagebox.showerror('show error',
                                  'the selected song is not playing!')
         # if a song is selected and the selected song is same as the
@@ -144,10 +147,10 @@ class MainApp:
         """
         try:
             # get next song index
-            next_song_index = self.song_list.curselection()[0] + 1
+            next_song_index = self.playlist.curselection()[0] + 1
             # if current song is the last song
             # then the next song is the first song
-            if next_song_index == self.song_list.size():
+            if next_song_index == self.playlist.size():
                 next_song_index = 0
             # play next song
             self.play_music_by_index(next_song_index)
@@ -161,11 +164,11 @@ class MainApp:
         """
         try:
             # get prev song index
-            prev_song_index = self.song_list.curselection()[0] - 1
+            prev_song_index = self.playlist.curselection()[0] - 1
             # if current song is the first song
             # then previous song is the last song
             if prev_song_index == -1:
-                prev_song_index = self.song_list.size() - 1
+                prev_song_index = self.playlist.size() - 1
             # play previous song
             self.play_music_by_index(prev_song_index)
         except IndexError:
@@ -179,10 +182,10 @@ class MainApp:
         try:
             # if the song playing is same as the song to be deleted
             # then pause the song before deleting it and update paused to True
-            if self.current_song == self.song_list.get(tk.ACTIVE) and \
+            if self.current_song == self.playlist.get(tk.ACTIVE) and \
                     self.paused is False:
                 self.pause_music()
-            self.song_list.delete(self.song_list.curselection()[0])
+            self.playlist.delete(self.playlist.curselection()[0])
         except IndexError:
             messagebox.showerror('show error', 'no song selected!')
 
@@ -192,7 +195,7 @@ class MainApp:
         :return: None
         """
         # get current song name
-        self.current_song = self.song_list.get(tk.ACTIVE)
+        self.current_song = self.playlist.get(tk.ACTIVE)
         # load current song
         pygame.mixer.music.load(SONGS_DIR / self.current_song)
         # play current song
@@ -203,7 +206,7 @@ class MainApp:
     def pause_music(self):
         """
         pause the music that was playing
-        :return:
+        :return: None
         """
         # pause the song
         pygame.mixer.music.pause()
@@ -213,7 +216,7 @@ class MainApp:
     def unpause_music(self):
         """
         unpause the song that was paused
-        :return:
+        :return: None
         """
         # unpause the song
         pygame.mixer.music.unpause()
@@ -223,14 +226,14 @@ class MainApp:
     def play_music_by_index(self, song_index):
         """
         activate the selected music
-        :return:
+        :return: None
         """
         # clear song_list
-        self.song_list.selection_clear(0, tk.END)
+        self.playlist.selection_clear(0, tk.END)
         # activate next song
-        self.song_list.activate(song_index)
+        self.playlist.activate(song_index)
         # select next song
-        self.song_list.selection_set(song_index)
+        self.playlist.selection_set(song_index)
         # play the music
         self.play_music()
 

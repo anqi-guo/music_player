@@ -34,13 +34,13 @@ class TestApp(unittest.TestCase):
             # simulate clicking on the "add" button
             self.app.click_add()
         # check that the song was added to the song list
-        song_list = self.app.song_list.get(0, tk.END)
+        song_list = self.app.playlist.get(0, tk.END)
         self.assertIn('lifelike.mp3', song_list)
 
     @patch('tkinter.messagebox.showerror')
     def test_click_add_duplicate_song(self, mock_messagebox):
         # set up the test by adding a song to the song_list
-        self.app.song_list.insert(tk.END, 'drop-it.mp3')
+        self.app.playlist.insert(tk.END, 'drop-it.mp3')
         # create a mock file dialog
         mock_file_dialog = Mock()
         mock_file_dialog.return_value = 'drop-it.mp3'
@@ -58,7 +58,7 @@ class TestApp(unittest.TestCase):
     def test_play_music_with_no_song_selected(self, mock_messagebox):
         # test if an error message is displayed when no song is selected to
         # play
-        self.app.song_list.selection_clear(0, 'end')
+        self.app.playlist.selection_clear(0, 'end')
         self.app.click_play()
         mock_messagebox.assert_called_once_with('show error',
                                                 'no song selected!')
@@ -67,8 +67,8 @@ class TestApp(unittest.TestCase):
     @patch('pygame.mixer.music.play')
     def test_play_music(self, mock_play, mock_load):
         # test if the selected song is played
-        self.app.song_list.insert('end', 'risk.mp3')
-        self.app.song_list.selection_set('end')
+        self.app.playlist.insert('end', 'risk.mp3')
+        self.app.playlist.selection_set('end')
         self.app.click_play()
         mock_load.assert_called_once_with(SONGS_DIR / 'risk.mp3')
         mock_play.assert_called_once_with()
@@ -76,8 +76,8 @@ class TestApp(unittest.TestCase):
     @patch('pygame.mixer.music.pause')
     def test_pause_music(self, mock_pause):
         # test if the playing music is paused
-        self.app.song_list.insert('end', 'risk.mp3')
-        self.app.song_list.selection_set('end')
+        self.app.playlist.insert('end', 'risk.mp3')
+        self.app.playlist.selection_set('end')
         self.app.click_play()
         self.app.click_pause()
         mock_pause.assert_called_once_with()
@@ -86,7 +86,7 @@ class TestApp(unittest.TestCase):
     def test_pause_music_with_no_song_selected(self, mock_messagebox):
         # test if an error message is displayed when no song is selected to
         # pause
-        self.app.song_list.selection_clear(0, 'end')
+        self.app.playlist.selection_clear(0, 'end')
         self.app.click_pause()
         mock_messagebox.assert_called_once_with('show error',
                                                 'no song selected!')
@@ -94,8 +94,8 @@ class TestApp(unittest.TestCase):
     @patch('tkinter.messagebox.showerror')
     def test_pause_music_with_no_song_playing(self, mock_messagebox):
         # Ensure that an error message is displayed when no song is playing
-        self.app.song_list.insert('end', 'risk.mp3')
-        self.app.song_list.selection_set('end')
+        self.app.playlist.insert('end', 'risk.mp3')
+        self.app.playlist.selection_set('end')
         self.app.click_play()
         self.app.click_pause()
         self.app.click_pause()
@@ -106,12 +106,12 @@ class TestApp(unittest.TestCase):
     def test_pause_music_with_selected_song_not_playing(self, mock_messagebox):
         # Ensure that an error message is displayed when selected song is not
         # playing
-        self.app.song_list.insert('end', 'risk.mp3')
-        self.app.song_list.selection_set('end')
+        self.app.playlist.insert('end', 'risk.mp3')
+        self.app.playlist.selection_set('end')
         self.app.click_play()
-        self.app.song_list.insert('end', 'drop-it.mp3')
-        self.app.song_list.selection_set('end')
-        self.app.song_list.activate('end')
+        self.app.playlist.insert('end', 'drop-it.mp3')
+        self.app.playlist.selection_set('end')
+        self.app.playlist.activate('end')
         self.app.click_pause()
         mock_messagebox.assert_called_once_with(
             'show error',
@@ -121,10 +121,10 @@ class TestApp(unittest.TestCase):
     @patch('pygame.mixer.music.play')
     def test_click_next(self, mock_play, mock_load):
         # test if next song is played
-        self.app.song_list.insert('end', 'risk.mp3')
-        self.app.song_list.insert('end', 'drop-it.mp3')
-        self.app.song_list.selection_set(0)
-        self.app.song_list.activate(0)
+        self.app.playlist.insert('end', 'risk.mp3')
+        self.app.playlist.insert('end', 'drop-it.mp3')
+        self.app.playlist.selection_set(0)
+        self.app.playlist.activate(0)
         self.app.click_next()
 
         mock_load.assert_called_once_with(SONGS_DIR / 'drop-it.mp3')
@@ -134,10 +134,10 @@ class TestApp(unittest.TestCase):
     @patch('pygame.mixer.music.play')
     def test_click_prev(self, mock_play, mock_load):
         # test if previous song is played
-        self.app.song_list.insert('end', 'risk.mp3')
-        self.app.song_list.insert('end', 'drop-it.mp3')
-        self.app.song_list.selection_set(0)
-        self.app.song_list.activate(0)
+        self.app.playlist.insert('end', 'risk.mp3')
+        self.app.playlist.insert('end', 'drop-it.mp3')
+        self.app.playlist.selection_set(0)
+        self.app.playlist.activate(0)
         self.app.click_prev()
 
         mock_load.assert_called_once_with(SONGS_DIR / 'drop-it.mp3')
@@ -146,15 +146,15 @@ class TestApp(unittest.TestCase):
     def test_click_delete(self):
         # test if the song is deleted
         # add a song
-        self.app.song_list.insert('end', 'risk.mp3')
-        self.app.song_list.selection_set('end')
-        self.app.song_list.activate('end')
+        self.app.playlist.insert('end', 'risk.mp3')
+        self.app.playlist.selection_set('end')
+        self.app.playlist.activate('end')
         # check if song is added to the listbox
-        assert self.app.song_list.size() == 1
+        assert self.app.playlist.size() == 1
         # delete the song
         self.app.click_delete()
         # check if listbox is empty
-        assert self.app.song_list.size() == 0
+        assert self.app.playlist.size() == 0
 
     @patch('tkinter.messagebox.showerror')
     def test_click_delete_with_no_song_selected(self, mock_messagebox):

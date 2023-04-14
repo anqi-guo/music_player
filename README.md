@@ -12,7 +12,8 @@ Libraries required for this project include:
 - Unittest
 
 ## Project Motivation
-This is the final project of CS5001
+This is the final project of CS5001. I chose to create a music player app 
+that reflects the content I learned in this course.
 
 ## File Descriptions
 ```

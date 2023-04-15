@@ -11,10 +11,12 @@ from music_player import MainApp, SONGS_DIR
 class TestApp(unittest.TestCase):
 
     def setUp(self):
+        """set root and app"""
         self.root = tk.Tk()
         self.app = MainApp(self.root)
 
     def tearDown(self):
+        """destroy all the widgets and exit mainloop"""
         self.root.destroy()
 
     def test_load_images(self) -> None:

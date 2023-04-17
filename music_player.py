@@ -191,7 +191,7 @@ class MainApp:
 
     def play_music(self):
         """
-        play the current music
+        play the currently selected music
         :return: None
         """
         # get current song name
@@ -225,7 +225,7 @@ class MainApp:
 
     def play_music_by_index(self, song_index):
         """
-        activate the selected music
+        play the music of specified index
         :return: None
         """
         # clear song_list

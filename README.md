@@ -20,7 +20,7 @@ that reflects the content I learned in this course.
 |--music_player.py: this is the file that runs the application
 |--test_music_player.py: this file contains all the tests for MainApp class
 |--audio: this folder contains all the music
-|--pic: this folder contains png images for buttons
+|--pic: this folder contains png images for buttons and a snapshot of the app
 ```
 ## Results
 ![alt text](https://github.com/anqi-guo/music_player/blob/main/pic/music_player.png?raw=true)

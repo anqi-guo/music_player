@@ -183,6 +183,7 @@ class TestApp(unittest.TestCase):
     def test_click_delete_with_no_song_selected(self, mock_messagebox):
         """Ensure that an error message is displayed when no song is
         selected"""
+        self.app.playlist.selection_clear(0, 'end')
         self.app.click_delete()
         mock_messagebox.assert_called_once_with('show error',
                                                 'no song selected!')

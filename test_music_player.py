@@ -135,6 +135,15 @@ class TestApp(unittest.TestCase):
         mock_load.assert_called_once_with(SONGS_DIR / 'drop-it.mp3')
         mock_play.assert_called_once_with()
 
+    @patch('tkinter.messagebox.showerror')
+    def test_click_next_with_no_song_selected(self, mock_messagebox):
+        """"test if an error message is displayed when no song is selected to
+        play"""
+        self.app.playlist.selection_clear(0, 'end')
+        self.app.click_next()
+        mock_messagebox.assert_called_once_with('show error',
+                                                'no song selected!')
+
     @patch('pygame.mixer.music.load')
     @patch('pygame.mixer.music.play')
     def test_click_prev(self, mock_play, mock_load):
@@ -147,6 +156,15 @@ class TestApp(unittest.TestCase):
 
         mock_load.assert_called_once_with(SONGS_DIR / 'drop-it.mp3')
         mock_play.assert_called_once_with()
+
+    @patch('tkinter.messagebox.showerror')
+    def test_click_prev_with_no_song_selected(self, mock_messagebox):
+        """"test if an error message is displayed when no song is selected to
+        play"""
+        self.app.playlist.selection_clear(0, 'end')
+        self.app.click_prev()
+        mock_messagebox.assert_called_once_with('show error',
+                                                'no song selected!')
 
     def test_click_delete(self):
         """test if the song is deleted"""
